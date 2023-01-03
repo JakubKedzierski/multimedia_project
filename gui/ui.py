@@ -1,5 +1,6 @@
 import os.path as path
 import wx
+from face_recognition import FaceRecognizer
 
 class UI(wx.Frame):
     panel = []
@@ -10,6 +11,7 @@ class UI(wx.Frame):
     log_label = []
     input_type = "brak"
     class_type = "brak"
+    face_recognizer = FaceRecognizer()
 
     def __init__(self):
         super().__init__(parent=None, title="Weryfikacja użytkownika", size=(400, 500))
@@ -44,7 +46,7 @@ class UI(wx.Frame):
         ### input form
         self.text_input = wx.StaticText(self.panel, pos=(5, 105), label="Typ wejścia:")
 
-        live_button = wx.Button(self.panel, label='Kamera Live', pos=(205, 135))
+        live_button = wx.Button(self.panel, label='Live', pos=(205, 135))
         live_button.Bind(wx.EVT_BUTTON, self.live_face_verification)
 
         test_dir_button = wx.Button(self.panel, label='Dane Testowe', pos=(55, 135))
@@ -81,12 +83,13 @@ class UI(wx.Frame):
         self.verification_label.SetLabel(self.class_type)
 
     def live_face_verification(self, event):
-        self.input_type = "Kamera live"
+        self.input_type = "Live"
         self.input_label.SetLabel(self.input_type)
 
     def test_dir_face_verification(self, event):
         self.input_type = "Testowe dane"
         self.input_label.SetLabel(self.input_type)
+
 
     def run_verification(self, event):
         if self.input_type == "brak" or self.class_type == "brak":
@@ -94,6 +97,18 @@ class UI(wx.Frame):
             return
         else:
             self.log_label.SetLabel("")
+
+            if self.input_type == "Live":
+                predicions = self.face_recognizer.live_recognition()
+                
+                # predicions[0] - klasa
+                # predicions[1] - prawdopodobienstwo
+
+                # tutaj rozpozawanie głosu
+
+                # łączenie wyników
+
+                # pokazanie ostatecznego wyniku
 
 
 if __name__ == '__main__':
