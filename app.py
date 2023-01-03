@@ -1,25 +1,40 @@
 import cv2 as cv
-  
-cam = cv.VideoCapture(0)
-face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+from PIL import Image
+import os
+import numpy as np
 
-while 1:  
-    result, image = cam.read()
-    if result:
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-        
-        for (x,y,w,h) in faces:
-            cv.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
+lbph_face_classifier_path = "lbph_classifier.yml"
+test_dir_images = "./train_images/yalafaces/test/"
+show_image = False
 
-        cv.imshow('img', image)
+lbph_face_classifier = cv.face.LBPHFaceRecognizer_create()
+lbph_face_classifier.read(lbph_face_classifier_path)
+
+all = 0
+good = 0
+
+for f in os.listdir(path=test_dir_images):
+    test_image = test_dir_images + f
+    image = Image.open(test_image).convert('L')
+    image_np = np.array(image,'uint8')
+
+    predictions = lbph_face_classifier.predict(image_np)
+    expected_output = int(os.path.split(test_image)[1].split('.')[0].replace("subject"," "))
+    
+    print("Predykcja: ")
+    print("Klasa: " + str(predictions[0]))
+    print("Prawdziwa klasa: " + str(expected_output))
+    print("P:" + str(predictions[1]))
+    print("----------------------")
+
+    all = all + 1
+    if predictions[0] == expected_output:
+        good = good + 1
+    
+    if show_image:
+        cv.imshow(f, image_np)
         key_code = cv.waitKey(0)
         cv.destroyAllWindows()
-        
-        if key_code & 0xFF == ord('q'):
-            break
 
-        
-    
-    else:
-        print("Something went wrong with camera\n")
+print("Dokładność:"  + str(good/all))
+
