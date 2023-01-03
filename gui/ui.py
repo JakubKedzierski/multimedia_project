@@ -59,12 +59,14 @@ class UI(wx.Frame):
         self.Show()
 
     def train_face_recognition(self, event):
+        self.log_label.SetLabel("")
         self.verification_label.SetForegroundColour(wx.Colour(0, 0, 0))
-        self.log_label.SetLabel("Uczenie rozpoznawania twarzy")
+        self.log_label.SetLabel("Uczenie rozpoznawania twarzy ...")
         self.Show()
 
+        self.face_recognizer.train_face_recognition()
         # progressin ...
-        #self.log_label.SetLabel("")
+        self.log_label.SetLabel("Algorytm rozpoznawania nauczony ")
 
     def train_voice_recognition(self, event):
         self.verification_label.SetForegroundColour(wx.Colour(0, 0, 0))

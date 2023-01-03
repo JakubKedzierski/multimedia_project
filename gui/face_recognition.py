@@ -104,5 +104,32 @@ class FaceRecognizer():
 
         return predictions
 
+    def train_face_recognition(self):
+        faces = []
+        ids = []
+
+        train_path = "./train_images/own_dataset/train/"
+        for f in os.listdir(path=train_path):
+            path = train_path + f
+            image = Image.open(path).convert('L')
+            image_np_main = np.array(image,'uint8')
+            faces_detected = self.face_cascade.detectMultiScale(image_np_main, scaleFactor=1.3,
+                                                minNeighbors=3,
+                                                minSize=(30, 30),
+                                                flags=cv.CASCADE_SCALE_IMAGE)
+            if len(faces_detected) > 0:
+                (x,y,w,h) = faces_detected[0]
+                copy = image_np_main.copy()
+                crop_image = copy[y:y+h, x:x+w]
+                image_np = np.array(crop_image,'uint8')
+                id = int(os.path.split(f)[1].split("_")[3].replace(".png"," "))
+                ids.append(id)
+                faces.append(image_np)
+
+        ids =  np.array(ids)
+        self.lbph_classifier = cv.face.LBPHFaceRecognizer_create()
+        self.lbph_classifier.train(faces, ids)
+        self.lbph_classifier.write('lbph_classifier_own_only_face.yml')
+
 
 
