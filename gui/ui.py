@@ -94,21 +94,58 @@ class UI(wx.Frame):
     def run_verification(self, event):
         if self.input_type == "brak" or self.class_type == "brak":
             self.log_label.SetLabel("Ustaw odpowiednie parametry (wejście, osoba do rozpoznania ...) !")
+            wx.MessageBox('Ustaw odpowiednie parametry (wejście, osoba do rozpoznania ...) !', 'Uwaga', wx.OK | wx.ICON_ERROR)
             return
         else:
             self.log_label.SetLabel("")
-
+            
             if self.input_type == "Live":
-                predicions = self.face_recognizer.live_recognition()
-                
+                msg = 'Pierwszy krok weryfikacji to rozpoznanie twarzy. Ustaw twarz odpowiednio do kamery ' + \
+                'a następnie kliknij spacje. Algorytm wskaże wynik rozpoznania, aby przejść dalej konieczne będzie wciśnięcie dowolnego klawisza'
+
+                if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
+                    predicions = self.face_recognizer.live_recognition()
+                    
+                    # predicions[0] - klasa
+                    # predicions[1] - prawdopodobienstwo
+
+                    # tutaj rozpozawanie głosu
+
+                    # łączenie wyników (twarz + głos)
+                    total_result = predicions
+
+
+                    msg = ''
+                    if total_result[0] == 1 and 'Jakub' in self.class_type:
+                        msg = "Weryfikacja poprawna. Użytkownika Jakub autoryzowany !"
+                    elif total_result[0] == 2 and 'Kacper' in self.class_type:
+                        msg = "Weryfikacja poprawna. Użytkownika Kacper autoryzowany !"
+                    else:
+                        msg = "Weryfikacja niepowiodła się."
+
+                    if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
+                        pass
+            elif self.input_type == "Testowe dane":
+                predicions = self.face_recognizer.test_image_recognition()
+
                 # predicions[0] - klasa
                 # predicions[1] - prawdopodobienstwo
 
                 # tutaj rozpozawanie głosu
 
-                # łączenie wyników
+                # łączenie wyników (twarz + głos)
+                total_result = predicions
 
-                # pokazanie ostatecznego wyniku
+                msg = ''
+                if total_result[0] == 1 and 'Jakub' in self.class_type:
+                    msg = "Weryfikacja poprawna. Użytkownika Jakub autoryzowany !"
+                elif total_result[0] == 2 and 'Kacper' in self.class_type:
+                    msg = "Weryfikacja poprawna. Użytkownika Kacper autoryzowany !"
+                else:
+                    msg = "Weryfikacja niepowiodła się."
+
+                if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
+                    pass
 
 
 if __name__ == '__main__':

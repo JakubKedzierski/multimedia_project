@@ -64,5 +64,45 @@ class FaceRecognizer():
         print("Koniec rozpoznawania twarzy")
         return predictions
 
+    def test_image_recognition(self):
+        test_image = './gui//test_data/' + 'image_1202_class_1.png'
+        image = Image.open(test_image).convert('L')
+        image_np_main = np.array(image,'uint8')
+        faces_detected = self.face_cascade.detectMultiScale(image_np_main, scaleFactor=1.3,
+                                            minNeighbors=3,
+                                            minSize=(30, 30),
+                                            flags=cv.CASCADE_SCALE_IMAGE)
+        #expected_output = int(os.path.split(test_image)[1].split("_")[3].replace(".png"," "))
+        predictions = []
+
+        if len(faces_detected) > 0:
+            (x,y,w,h) = faces_detected[0]
+            cv.rectangle(image_np_main, (x,y),(x+w,y+h),(255,0,0),2)
+            copy = image_np_main.copy()
+            crop_image = copy[y:y+h, x:x+w]
+            image_np = np.array(crop_image,'uint8')
+            predictions = self.lbph_face_classifier.predict(image_np)
+
+            print("Predykcja: ")
+            print("Klasa: " + str(predictions[0]))
+            #print("Prawdziwa klasa: " + str(expected_output))
+            print("P:" + str(predictions[1]))
+            print("----------------------")
+
+        else:
+            predictions = [0, 50]
+            print("Predykcja: ")
+            print("Klasa: " + str(0))
+            #print("Prawdziwa klasa: " + str(expected_output))
+            print("P: " + 'x')
+            print("----------------------")
+
+
+        cv.imshow("TEST", image_np_main)
+        key_code = cv.waitKey(0)
+        cv.destroyAllWindows()
+
+        return predictions
+
 
 
