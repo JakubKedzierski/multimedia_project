@@ -23,6 +23,12 @@ class FaceRecognizer():
 
         while 1:  
             result, image = cam.read()
+            R, G, B = cv.split(image)
+            output1_R = cv.equalizeHist(R)
+            output1_G = cv.equalizeHist(G)
+            output1_B = cv.equalizeHist(B)
+            image = cv.merge((output1_R, output1_G, output1_B))
+
             cv.imshow('Rozpoznawanie twarzy', image)
             key_code = cv.waitKey(10)
             
@@ -30,6 +36,8 @@ class FaceRecognizer():
                 image_copy = image.copy()
                 if result:
                     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+                    cv.equalizeHist(gray)
+                    
                     faces_detected = self.face_cascade.detectMultiScale(gray, scaleFactor=1.3,
                                                         minNeighbors=3,
                                                         minSize=(30, 30),
@@ -60,12 +68,16 @@ class FaceRecognizer():
                     
                 else:
                     print("Something went wrong with camera\n")
-        
+    
         print("Koniec rozpoznawania twarzy")
         return predictions
 
     def test_image_recognition(self):
-        test_image = './gui//test_data/' + 'image_1202_class_1.png'
+        #test_image = './gui//test_data/' + 'image_1202_class_1.png'
+
+        test_path = './gui//test_data/'
+        test_image = test_path + os.listdir(path=test_path)[1]        
+
         image = Image.open(test_image).convert('L')
         image_np_main = np.array(image,'uint8')
         faces_detected = self.face_cascade.detectMultiScale(image_np_main, scaleFactor=1.3,
@@ -113,6 +125,7 @@ class FaceRecognizer():
             path = train_path + f
             image = Image.open(path).convert('L')
             image_np_main = np.array(image,'uint8')
+            cv.equalizeHist(image_np_main)
             faces_detected = self.face_cascade.detectMultiScale(image_np_main, scaleFactor=1.3,
                                                 minNeighbors=3,
                                                 minSize=(30, 30),
