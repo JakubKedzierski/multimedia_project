@@ -23,11 +23,14 @@ class FaceRecognizer():
 
         while 1:  
             result, image = cam.read()
-            R, G, B = cv.split(image)
-            output1_R = cv.equalizeHist(R)
-            output1_G = cv.equalizeHist(G)
-            output1_B = cv.equalizeHist(B)
-            image = cv.merge((output1_R, output1_G, output1_B))
+            #R, G, B = cv.split(image)
+            #output1_R = cv.equalizeHist(R)
+            #output1_G = cv.equalizeHist(G)
+            #output1_B = cv.equalizeHist(B)
+            #image = cv.merge((output1_R, output1_G, output1_B))
+            # https://answers.opencv.org/question/223885/how-to-improve-identification-confidence-using-lbphfacerecognizer/
+            # https://stackoverflow.com/questions/25683514/how-to-calculate-percentage-format-prediction-confidence-of-face-recognition-usi
+
 
             cv.imshow('Rozpoznawanie twarzy', image)
             key_code = cv.waitKey(10)
@@ -36,8 +39,10 @@ class FaceRecognizer():
                 image_copy = image.copy()
                 if result:
                     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-                    cv.equalizeHist(gray)
-                    
+                    #gray = cv.equalizeHist(gray)
+                    #normalised_image = np.zeros(gray.shape)
+                    #gray = cv.normalize(gray, normalised_image, 0, 255, cv.NORM_MINMAX)
+
                     faces_detected = self.face_cascade.detectMultiScale(gray, scaleFactor=1.3,
                                                         minNeighbors=3,
                                                         minSize=(30, 30),
@@ -48,7 +53,10 @@ class FaceRecognizer():
                         crop_image = gray[y:y+h, x:x+w]
                         image_np = np.array(crop_image,'uint8')
                         predictions = self.lbph_face_classifier.predict(image_np)
+                        predictions = list(predictions)
 
+                        # change distance to prob: 250 - 0%p, 1 - 100%p , a = -100/249, b= 100,5
+                        predictions[1] = min(-100/249 * predictions[1] + 100.5, 100)
                         print("Predykcja: ")
                         print("Klasa: " + str(predictions[0]))
                         print("P:" + str(predictions[1]))
@@ -68,7 +76,8 @@ class FaceRecognizer():
                     
                 else:
                     print("Something went wrong with camera\n")
-    
+
+
         print("Koniec rozpoznawania twarzy")
         return predictions
 
@@ -94,6 +103,10 @@ class FaceRecognizer():
             crop_image = copy[y:y+h, x:x+w]
             image_np = np.array(crop_image,'uint8')
             predictions = self.lbph_face_classifier.predict(image_np)
+            predictions = list(predictions)
+
+            # change distance to prob: 250 - 0%p, 1 - 100%p , a = -100/249, b= 100,5
+            predictions[1] = min(-100/249 * predictions[1] + 100.5, 100)
 
             print("Predykcja: ")
             print("Klasa: " + str(predictions[0]))
@@ -125,7 +138,11 @@ class FaceRecognizer():
             path = train_path + f
             image = Image.open(path).convert('L')
             image_np_main = np.array(image,'uint8')
-            cv.equalizeHist(image_np_main)
+            #image_np_main = cv.resize(image_np_main, (200, 200), interpolation=cv.INTER_AREA)
+            #image_np_main = cv.equalizeHist(image_np_main)
+            #normalised_image = np.zeros(image_np_main.shape)
+            #image_np_main = cv.normalize(image_np_main, normalised_image, 0, 255, cv.NORM_MINMAX)
+            
             faces_detected = self.face_cascade.detectMultiScale(image_np_main, scaleFactor=1.3,
                                                 minNeighbors=3,
                                                 minSize=(30, 30),

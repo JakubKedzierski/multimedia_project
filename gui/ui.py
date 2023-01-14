@@ -108,22 +108,28 @@ class UI(wx.Frame):
                 if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
                     predicions = self.face_recognizer.live_recognition()
                     
-                    # predicions[0] - klasa
+                    # predicions[0] - klasa : 0-> tło, brak  1->Kuba, 2->Kacper
                     # predicions[1] - prawdopodobienstwo
 
+
                     # tutaj rozpozawanie głosu
+
+
 
                     # łączenie wyników (twarz + głos)
                     total_result = predicions
 
+                    # if probability < 50 change result to unrecognized 
+                    if total_result[1] < 50:
+                        total_result[0] = 0
 
-                    msg = ''
+                    msg = 'Prawdopodobieństwo: ' + "{:.2f}".format(total_result[1]) + '\n'
                     if total_result[0] == 1 and 'Jakub' in self.class_type:
-                        msg = "Weryfikacja poprawna. Użytkownika Jakub autoryzowany !"
+                        msg = msg + "Weryfikacja poprawna. Użytkownika Jakub autoryzowany !"
                     elif total_result[0] == 2 and 'Kacper' in self.class_type:
-                        msg = "Weryfikacja poprawna. Użytkownika Kacper autoryzowany !"
+                        msg = msg + "Weryfikacja poprawna. Użytkownika Kacper autoryzowany !"
                     else:
-                        msg = "Weryfikacja niepowiodła się."
+                        msg = msg + "Weryfikacja niepowiodła się."
 
                     if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
                         pass
