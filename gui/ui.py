@@ -146,11 +146,11 @@ class UI(wx.Frame):
 
                 msg = ''
                 if total_result[0] == 1 and 'Jakub' in self.class_type:
-                    msg = "Weryfikacja poprawna. Użytkownika Jakub autoryzowany !"
+                    msg = "Weryfikacja poprawna. Użytkownik Jakub autoryzowany !"
                 elif total_result[0] == 2 and 'Kacper' in self.class_type:
-                    msg = "Weryfikacja poprawna. Użytkownika Kacper autoryzowany !"
+                    msg = "Weryfikacja poprawna. Użytkownik Kacper autoryzowany !"
                 else:
-                    msg = "Weryfikacja niepowiodła się."
+                    msg = "Weryfikacja nie powiodła się."
 
                 if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
                     pass
