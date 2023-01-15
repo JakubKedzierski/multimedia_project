@@ -149,11 +149,20 @@ class UI(wx.Frame):
                     # łączenie wyników (twarz + głos)
                     # głos zwraca 0 lub 100, 0 to brak weryfikacji, 100 to sukces
 
-                    total_result = predicions + 0.2*voice_result # 0.2 to waga weryfikacji
+                    total_result = predicions
+                    if (self.class_type == 'Jakub' and predicions[0] == 1) or (self.class_type == 'Kacper' and predicions[0] == 2):
+                        total_result[1] = predicions[1] * 0.65 + 0.35 * voice_result
+                    else:
+                        total_result[1] = (100 - predicions[1]) * 0.5 + 0.5 * voice_result
+                        if total_result[1] > 50 and self.class_type == 'Jakub':
+                            total_result[0] = 1
+                        elif total_result[1] > 50 and self.class_type == 'Kacper':
+                            total_result[0] = 2
 
                     # if probability < 50 change result to unrecognized 
                     if total_result[1] < 50:
                         total_result[0] = 0
+
 
                     msg = 'Prawdopodobieństwo: ' + "{:.2f}".format(total_result[1]) + '\n'
                     if total_result[0] == 1 and 'Jakub' in self.class_type:
@@ -182,8 +191,19 @@ class UI(wx.Frame):
                     if self.voice_recognizer.decide_for_test(who='kuba') is True:
                         voice_result = 100
 
-                # łączenie wyników (twarz + głos)
-                total_result = predicions+0.2*voice_result
+                total_result = predicions
+                if (self.class_type == 'Jakub' and predicions[0] == 1) or (self.class_type == 'Kacper' and predicions[0] == 2):
+                    total_result[1] = predicions[1] * 0.65 + 0.35 * voice_result
+                else:
+                    total_result[1] = (100 - predicions[1]) * 0.5 + 0.5 * voice_result
+                    if total_result[1] > 50 and self.class_type == 'Jakub':
+                        total_result[0] = 1
+                    elif total_result[1] > 50 and self.class_type == 'Kacper':
+                        total_result[0] = 2
+
+                # if probability < 50 change result to unrecognized 
+                if total_result[1] < 50:
+                    total_result[0] = 0
 
                 msg = ''
                 if total_result[0] == 1 and 'Jakub' in self.class_type:
