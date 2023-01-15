@@ -10,17 +10,17 @@ from recorder import record_audio
 
 def record_test_author(who):
     #TODO Ustawić liczbę powtórzeń, od 20 do max 50
-    for i in range(25):
+    for i in range(20):
         print('start recording file '+str(i+1))
-        record_audio('train_voice/data/'+who+'/'+who+'_'+str(100+i+1))
+        record_audio('train_voice/data/'+who+'_'+str(1000+i+1))
         print('recording file '+str(i+1)+' finished')
 
-def record_test_other(who):
-    for i in range(15):
+def record_test_other():
+    for i in range(5):
         print('start recording file '+str(i+1))
-        record_audio('train_voice/data/'+who+'/inny_'+str(100+i+1))
+        record_audio('train_voice/data/inny_'+str(1000+i+1))
         print('recording file '+str(i+1)+' finished')
 
 
-record_test_author('kuba')
-# record_test_other('kuba')
+record_test_author('kacper')
+record_test_other()

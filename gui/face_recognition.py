@@ -14,8 +14,8 @@ class FaceRecognizer():
     
     def __init__(self):
         self.lbph_face_classifier = cv.face.LBPHFaceRecognizer_create()
-        self.lbph_face_classifier.read("lbph_classifier_own_only_face.yml")
-        self.face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+        self.lbph_face_classifier.read("../lbph_classifier_own_only_face.yml") #u kacpra trzeba dodać../
+        self.face_cascade = cv.CascadeClassifier('../haarcascade_frontalface_default.xml') #u kacpra trzeba dodać ../
 
     def live_recognition(self):
         cam = cv.VideoCapture(0)

@@ -1,6 +1,9 @@
 import os.path as path
 import wx
 from face_recognition import FaceRecognizer
+from voice_recognition import VoiceRecognizer
+import winsound
+import time
 
 class UI(wx.Frame):
     panel = []
@@ -12,6 +15,7 @@ class UI(wx.Frame):
     input_type = "brak"
     class_type = "brak"
     face_recognizer = FaceRecognizer()
+    voice_recognizer = VoiceRecognizer()
 
     def __init__(self):
         super().__init__(parent=None, title="Weryfikacja użytkownika", size=(400, 500))
@@ -69,12 +73,19 @@ class UI(wx.Frame):
         self.log_label.SetLabel("Algorytm rozpoznawania nauczony ")
 
     def train_voice_recognition(self, event):
+        self.log_label.SetLabel("")
         self.verification_label.SetForegroundColour(wx.Colour(0, 0, 0))
         self.log_label.SetLabel("Uczenie rozpoznawania głosu")
         self.Show()
 
+        if self.class_type == "Kacper":
+            print("Uczenie algorytmu dla Kacper")
+            self.voice_recognizer.train_voice_recognition(who='kacper')
+        if self.class_type == "Jakub":
+            print("Uczenie algorytmu dla Jakub")
+            self.voice_recognizer.train_voice_recognition(who='kuba')
         # progressin ...
-        #self.log_label.SetLabel("")
+        self.log_label.SetLabel("Algorytm rozpoznawania nauczony")
 
     def verify_kacper(self, event):
         self.class_type = "Kacper"
@@ -107,17 +118,38 @@ class UI(wx.Frame):
 
                 if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
                     predicions = self.face_recognizer.live_recognition()
-                    
+
                     # predicions[0] - klasa : 0-> tło, brak  1->Kuba, 2->Kacper
                     # predicions[1] - prawdopodobienstwo
 
 
                     # tutaj rozpozawanie głosu
+                    msg = 'Kolejny krok weryfikacji to biometria mowy. Po usłyszeniu sygnału wypowiedz hasło.'
+                    voice_result = 0
+                    if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:
 
+                        if self.class_type == 'Kacper':
+                            print("recording started")
+                            self.beep()
+                            self.voice_recognizer.record_live_sample()
+                            self.beep()
+                            print("recording ended")
+                            if self.voice_recognizer.decide(who='kacper') is True:
+                                voice_result = 100
+                        if self.class_type == 'Jakub':
+                            print("recording started")
+                            self.beep()
+                            self.voice_recognizer.record_live_sample()
+                            self.beep()
+                            print("recording ended")
+                            if self.voice_recognizer.decide(who='kuba') is True:
+                                voice_result = 100
 
 
                     # łączenie wyników (twarz + głos)
-                    total_result = predicions
+                    # głos zwraca 0 lub 100, 0 to brak weryfikacji, 100 to sukces
+
+                    total_result = predicions + 0.2*voice_result # 0.2 to waga weryfikacji
 
                     # if probability < 50 change result to unrecognized 
                     if total_result[1] < 50:
@@ -131,8 +163,10 @@ class UI(wx.Frame):
                     else:
                         msg = msg + "Weryfikacja niepowiodła się."
 
-                    if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
+                    if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:
                         pass
+
+
             elif self.input_type == "Testowe dane":
                 predicions = self.face_recognizer.test_image_recognition()
 
@@ -140,9 +174,16 @@ class UI(wx.Frame):
                 # predicions[1] - prawdopodobienstwo
 
                 # tutaj rozpozawanie głosu
+                voice_result = 0
+                if self.class_type == 'Kacper':
+                    if self.voice_recognizer.decide_for_test(who='kacper') is True:
+                        voice_result = 100
+                if self.class_type == 'Jakub':
+                    if self.voice_recognizer.decide_for_test(who='kuba') is True:
+                        voice_result = 100
 
                 # łączenie wyników (twarz + głos)
-                total_result = predicions
+                total_result = predicions+0.2*voice_result
 
                 msg = ''
                 if total_result[0] == 1 and 'Jakub' in self.class_type:
@@ -155,6 +196,9 @@ class UI(wx.Frame):
                 if wx.MessageBox(msg, 'Informacja', wx.OK | wx.ICON_INFORMATION) == wx.OK:  
                     pass
 
+    def beep(self):
+        winsound.Beep(440, 250)  # frequency, duration
+        time.sleep(0.25)  # in seconds (0.25 is 250ms)
 
 if __name__ == '__main__':
     app = wx.App()
