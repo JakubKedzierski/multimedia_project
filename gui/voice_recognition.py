@@ -15,7 +15,7 @@ class VoiceRecognizer():
         recorder.record_audio('../output')
 
     def train_voice_recognition(self, who):
-        learn.train_on_test(who=who)
+        learn.train_for_classname(who=who)
 
     def decide_for_test(self, who):
         model = pickle.load(open('../train_voice/models/' + who + '.sav', 'rb'))
